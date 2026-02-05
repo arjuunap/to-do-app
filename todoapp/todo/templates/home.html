@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tasks</title>
+</head>
+<body>
+    <h1>My Tasks</h1>
+
+    <ul>
+        {% for task in tasks %}
+            <li>
+                <form method="POST" action="{% url 'toggle' task.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="checkbox" onchange="this.form.submit()" {% if task.completed %}checked{% endif %}>
+                </form>
+
+                {% if task.completed %}
+                    <s>{{ task.title }}</s>
+                {% else %}
+                    {{ task.title }}
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>No tasks yet</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
