@@ -1,28 +1,163 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tasks</title>
+    <title>My Tasks</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            /* align-items: flex-start; */
+            /* height: 100vh; */
+        }
+
+        .container {
+            background: #ffffff;
+            margin-top: 60px;
+            padding: 25px;
+            width: 400px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Add task form */
+        .add-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-form input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+
+        .add-form button {
+            padding: 10px 16px;
+            border: none;
+            background: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .add-form button:hover {
+            background: #43a047;
+        }
+
+        /* Task list */
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .task-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .completed {
+            text-decoration: line-through;
+            color: gray;
+        }
+
+        /* Buttons */
+        .btn {
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            background: #e53935;
+            color: white;
+        }
+
+        
+
+        .delete-btn:hover {
+            background: #c62828;
+        }
+
+        .edit-link {
+            font-size: 12px;
+            text-decoration: none;
+            color: #1976d2;
+            margin-left: 8px;
+        }
+
+        .edit-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty {
+            text-align: center;
+            color: gray;
+            padding: 20px 0;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>My Tasks</h1>
+    <div class="container">
+        <h1>📝 My Tasks</h1>
 
-    <ul>
-        {% for task in tasks %}
-            <li>
-                <form method="POST" action="{% url 'toggle' task.id %}" style="display:inline;">
-                    {% csrf_token %}
-                    <input type="checkbox" onchange="this.form.submit()" {% if task.completed %}checked{% endif %}>
-                </form>
+        <!-- Add task -->
+        <form action="{% url 'add_task' %}" method="post" class="add-form">
+            {% csrf_token %}
+            <input type="text" name="title" placeholder="Enter new task..." required>
+            <button type="submit">Add</button>
+        </form>
 
-                {% if task.completed %}
-                    <s>{{ task.title }}</s>
-                {% else %}
-                    {{ task.title }}
-                {% endif %}
-            </li>
-        {% empty %}
-            <li>No tasks yet</li>
-        {% endfor %}
-    </ul>
+        <ul>
+            {% for task in tasks %}
+                <li>
+                    <div class="task-left">
+                        <form method="POST" action="{% url 'toggle' task.id %}">
+                            {% csrf_token %}
+                            <input type="checkbox"
+                                   onchange="this.form.submit()"
+                                   {% if task.completed %}checked{% endif %}>
+                        </form>
+
+                        <span class="{% if task.completed %}completed{% endif %}">
+                            {{ task.title }}
+                        </span>
+                    </div>
+
+                    <div>
+                        <form method="POST" action="{% url 'delete_task' task.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button class="btn delete-btn">Delete</button>
+                        </form>
+
+                        <a href="{% url 'edit_task' task.id %}" class="edit-link">Edit</a>
+                    </div>
+                </li>
+            {% empty %}
+                <li class="empty">No tasks yet. Add one above 👆</li>
+            {% endfor %}
+        </ul>
+    </div>
 </body>
 </html>
